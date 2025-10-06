@@ -3,19 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment"
-    android:background="#EEBB22" >
+    android:background="#EEBB22"
+    tools:context=".HomeFragment">
 
     <ImageView
-        android:layout_width="0dp"
-        android:scaleType="fitStart"
-        android:layout_height="50dp"
-        android:src="@drawable/logo"
-        android:layout_weight="1"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/noise" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/gift" />
 </LinearLayout>
 
