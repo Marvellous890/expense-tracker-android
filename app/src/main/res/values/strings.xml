@@ -19,5 +19,16 @@
     <string name="recent_transactions">Recent Transactions</string>
     <string name="entertainment">Entertainment</string>
     <string name="main_account_today">Main Account · Today</string>
+    <string name="add_transaction">Add Transaction</string>
+    <string name="expense_name">Expense Name</string>
+    <string name="amount">Amount</string>
+    <string name="description">Description</string>
+    <string name="date_amp_time"><![CDATA[Date & Time]]></string>
+    <string name="_26_09_2025">26/09/2025</string>
+    <string name="_08_26_am">08:26 AM</string>
+    <string name="budget">Budget</string>
+    <string name="select_a_budget">Select a budget</string>
+    <string name="new_monthly_budget">New Monthly Budget</string>
+    <string name="add">Add</string>
 
 </resources>

@@ -49,7 +49,7 @@ public class AddTransactionFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-       return  inflater.inflate(R.layout.layout_bottom_sheet, container, false);
+       return  inflater.inflate(R.layout.fragment_add_transaction, container, false);
     }
 
     @Override
