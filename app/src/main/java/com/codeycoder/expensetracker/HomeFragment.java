@@ -3,17 +3,19 @@ package com.codeycoder.expensetracker;
 import static com.codeycoder.expensetracker.Utilities.dp;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +27,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.codeycoder.expensetracker.databinding.FragmentHomeBinding;
+import com.codeycoder.expensetracker.views.Button;
+import com.codeycoder.expensetracker.views.CircularIconButton;
+import com.codeycoder.expensetracker.views.RoundableProgressBar;
+import com.codeycoder.expensetracker.views.RoundedCard;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
@@ -47,17 +57,20 @@ public class HomeFragment extends Fragment {
         /*binding = FragmentHomeBinding.inflate(inflater, container, false);
         return binding.getRoot();*/
 
+//        FrameLayout rootFrame = new FrameLayout(context);
+
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        root.setPadding(16, 64, 32, 16);
+        root.setPadding(dp(8), dp(16), dp(8), dp(8));
+//        rootFrame.addView(root, LayoutHelper.createFrameMatchParent());
 
         GradientDrawable backgroundGradient = new GradientDrawable();
         backgroundGradient.setOrientation(GradientDrawable.Orientation.TOP_BOTTOM);
         int[] bgColors = {Color.parseColor("#DA6736"), Color.parseColor("#00DA6736"), 0xFFFFFFFF};
         backgroundGradient.setColors(bgColors);
 
-        root.setBackground(backgroundGradient);
+        root.setBackgroundColor(0xFFE8753B);
 
         LinearLayout appBar = new LinearLayout(context);
         root.addView(appBar);
@@ -92,7 +105,7 @@ public class HomeFragment extends Fragment {
 
         RoundedCard mainCard = new RoundedCard(context, dp(16));
         LinearLayout.LayoutParams mainCardParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, dp(210));
-        mainCardParams.topMargin = dp(16);
+        mainCardParams.topMargin = dp(8);
         root.addView(mainCard, mainCardParams);
 
         ImageView noiseBg = new ImageView(context);
@@ -202,55 +215,154 @@ public class HomeFragment extends Fragment {
         comparedToTextExpense.setTextColor(getResources().getColor(R.color.grayscale_600));
         expenseLayout.addView(comparedToTextExpense);
 
+        LinearLayout secondRowContainer = new LinearLayout(context);
+        root.addView(secondRowContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 16, 0, 16));
 
+        RoundedCard budgetCard = new RoundedCard(context, 16);
+        secondRowContainer.addView(budgetCard, LayoutHelper.createLinear(0, 150, 1));
+
+        LinearLayout budgetCardLayout = new LinearLayout(context);
+        budgetCardLayout.setOrientation(LinearLayout.VERTICAL);
+        budgetCard.addView(budgetCardLayout, LayoutHelper.createFrameMatchParent());
+
+        TextView budgetHeader = new TextView(context);
+        budgetHeader.setCompoundDrawablesWithIntrinsicBounds(
+                getContext().getDrawable(R.drawable.piggy_bank),
+                null,
+                getContext().getDrawable(R.drawable.arrow_right_line),
+                null
+        );
+        budgetHeader.setCompoundDrawablePadding(dp(4));
+        budgetHeader.setPadding(dp(8), dp(8), dp(8), dp(8));
+        budgetHeader.setText(getString(R.string.budgets));
+        budgetHeader.setGravity(Gravity.BOTTOM);
+        budgetCardLayout.addView(budgetHeader, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        budgetCardLayout.addView(Utilities.createDivider(context, context.getColor(R.color.grayscale_100), 1), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+
+        LinearLayout budgetContainerLayout = new LinearLayout(context);
+        budgetContainerLayout.setOrientation(LinearLayout.VERTICAL);
+        budgetContainerLayout.setPadding(dp(8), dp(10), dp(8), dp(8));
+        budgetCardLayout.addView(budgetContainerLayout, LayoutHelper.createLinearMatchParent());
+
+        TextView budgetCountsText = new TextView(context);
+        SpannableString budgetCounts = new SpannableString(getString(R.string.n_budgets, 3));
+        budgetCounts.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        budgetCounts.setSpan(new RelativeSizeSpan(1.5f), 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        budgetCounts.setSpan(new ForegroundColorSpan(0xFF000000), 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        budgetCountsText.setText(budgetCounts);
+        budgetContainerLayout.addView(budgetCountsText, LayoutHelper.createLinearWrapContent());
+
+        RoundableProgressBar progressBar = new RoundableProgressBar(context);
+        budgetContainerLayout.addView(progressBar, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8, 0, 32, 0, 0));
+
+        TextView percentOfTotalBudgetSpent = new TextView(context);
+        percentOfTotalBudgetSpent.setText(getString(R.string.percent_of_total_budget_spent, 50));
+        budgetContainerLayout.addView(percentOfTotalBudgetSpent, LayoutHelper.createLinearWrapContent());
+
+        RoundedCard analyticsCard = new RoundedCard(context, 16);
+        secondRowContainer.addView(analyticsCard, LayoutHelper.createLinear(0, 150, 1, 8, 0, 0, 0));
+
+        LinearLayout analyticsCardLayout = new LinearLayout(context);
+        analyticsCardLayout.setOrientation(LinearLayout.VERTICAL);
+        analyticsCard.addView(analyticsCardLayout, LayoutHelper.createFrameMatchParent());
+
+        TextView analyticsHeader = new TextView(context);
+        analyticsHeader.setCompoundDrawablesWithIntrinsicBounds(
+                getContext().getDrawable(R.drawable.analytics),
+                null,
+                getContext().getDrawable(R.drawable.arrow_right_line),
+                null
+        );
+        analyticsHeader.setCompoundDrawablePadding(dp(4));
+        analyticsHeader.setPadding(dp(8), dp(8), dp(8), dp(8));
+        analyticsHeader.setText(getString(R.string.analytics));
+        analyticsHeader.setGravity(Gravity.BOTTOM);
+        analyticsCardLayout.addView(analyticsHeader, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        analyticsCardLayout.addView(Utilities.createDivider(context, context.getColor(R.color.grayscale_100), 1), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+
+        LinearLayout analyticsCardContentLayout = new LinearLayout(context);
+        analyticsCardContentLayout.setOrientation(LinearLayout.VERTICAL);
+        analyticsCardContentLayout.setPadding(dp(8), dp(8), dp(8), dp(8));
+        analyticsCardLayout.addView(analyticsCardContentLayout, LayoutHelper.createLinearMatchParent());
+
+        TextView thisMonthSpending = new TextView(context);
+        thisMonthSpending.setText(getString(R.string.this_month_spending));
+        analyticsCardContentLayout.addView(thisMonthSpending, LayoutHelper.createLinearWrapContent());
+
+        TextView analyticsNairaAmount = new TextView(context);
+        analyticsNairaAmount.setText(getString(R.string.naira_amount, NumberFormat.getNumberInstance().format(309_087)));
+        analyticsNairaAmount.setTextColor(0xFF000000);
+        analyticsNairaAmount.setTextSize(16);
+        analyticsCardContentLayout.addView(analyticsNairaAmount, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 8, 0, 8));
+
+        TextView analyticsComparedText = new TextView(context);
+        analyticsComparedText.setText(getString(R.string.analytics_compared_last_month));
+        analyticsComparedText.setCompoundDrawablesWithIntrinsicBounds(getContext().getDrawable(R.drawable.decrease_peformance), null, null, null);
+        analyticsComparedText.setCompoundDrawablePadding(dp(4));
+        analyticsComparedText.setTextColor(context.getColor(R.color.success_300));
+        analyticsCardContentLayout.addView(analyticsComparedText, LayoutHelper.createLinearWrapContent());
+
+        RoundedCard transactionsCard = new RoundedCard(context, 16);
+        root.addView(transactionsCard, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        LinearLayout transactionsCardLayout = new LinearLayout(context);
+        transactionsCardLayout.setOrientation(LinearLayout.VERTICAL);
+        transactionsCardLayout.setPadding(dp(16), dp(16), dp(16), dp(16));
+        transactionsCard.addView(transactionsCardLayout, LayoutHelper.createFrameMatchParent());
+
+        LinearLayout recentTransactionsLayout = new LinearLayout(context);
+        recentTransactionsLayout.setGravity(Gravity.CENTER_VERTICAL);
+        transactionsCardLayout.addView(recentTransactionsLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 8));
+
+        TextView recentTransactions = new TextView(context);
+        recentTransactions.setText(getString(R.string.recent_transactions));
+        recentTransactions.setTextColor(0xFF000000);
+        recentTransactions.setTypeface(getResources().getFont(R.font.notoserif_semibold));
+        recentTransactions.setTextSize(14);
+        recentTransactionsLayout.addView(recentTransactions, LayoutHelper.createLinear(0, -2, 1));
+
+        Button seeAllBtn = new Button(context);
+        seeAllBtn.setBackground(context.getDrawable(R.drawable.bg));
+        seeAllBtn.setText(getString(R.string.see_all));
+        recentTransactionsLayout.addView(seeAllBtn, LayoutHelper.createLinearWrapContent());
+
+        RecyclerView transactionsList = new RecyclerView(context);
+        transactionsList.setLayoutManager(new LinearLayoutManager(context));
+        TransactionListAdapter adapter = new TransactionListAdapter();
+        setData(adapter);
+        transactionsList.setAdapter(adapter);
+        transactionsCardLayout.addView(transactionsList, LayoutHelper.createLinearMatchParent());
+
+//        FrameLayout bottomBar = new RoundedCard(context, dp(50));
+//        bottomBar.setBackgroundColor(0xFFFF0000);
+//        rootFrame.addView(bottomBar, LayoutHelper.createFrame(-1, 80, Gravity.BOTTOM, 10, 0, 10, 8));
 
         return root;
+
+    }
+
+    private void setData(TransactionListAdapter adapter) {
+        List<Transaction> data = new ArrayList<>();
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        data.add(new Transaction("", 0, 0));
+        adapter.setData(data);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    public class CircularIconButton extends FrameLayout {
-
-        public CircularIconButton(@NonNull Context context) {
-            super(context);
-        }
-
-        @Override
-        public void dispatchDraw(Canvas canvas) {
-            float radius = Math.min(getWidth(), getHeight()) / 2f;
-            float cx = getWidth() / 2f;
-            float cy = getHeight() / 2f;
-
-            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setColor(0xFFFFFFFF);
-            canvas.drawCircle(cx, cy, radius, paint);
-            paint.setColor(0xFFE7E5E4);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(dp(2));
-            canvas.drawCircle(cx, cy, radius - paint.getStrokeWidth() / 2f, paint);
-            super.dispatchDraw(canvas);
-        }
-    }
-
-    public class RoundedCard extends FrameLayout {
-        int radius;
-
-        public RoundedCard(Context context, int radius) {
-            super(context);
-            this.radius = radius;
-            setBackgroundColor(0xFFFFFFFF);
-        }
-
-        @Override
-        public void draw(@NonNull Canvas canvas) {
-            Path clipPath = new Path();
-            clipPath.addRoundRect(new RectF(0, 0, getWidth(), getHeight()), radius, radius, Path.Direction.CW);
-            canvas.clipPath(clipPath);
-            super.draw(canvas);
-        }
     }
 }

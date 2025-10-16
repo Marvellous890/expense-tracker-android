@@ -14,5 +14,7 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="android:fontFamily">@font/notoserif_family</item>
+        <item name="android:textColor">@color/grayscale_500</item>
+        <item name="android:textSize">12sp</item>
     </style>
 </resources>

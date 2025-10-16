@@ -5,7 +5,19 @@
     <string name="income">Income</string>
     <string name="expense">Expense</string>
     <string name="comparedTo">Compared to ₦%1$.2f last month</string>
+
     <string name="naira_amount">₦%1$s</string>
     <string name="balance_percent">%1$.2f%%</string>
+
+    <string name="budgets">Budgets</string>
+    <string name="n_budgets">%1$d budgets</string>
+    <string name="percent_of_total_budget_spent">%1$d%% of total budget spent</string>
+    <string name="analytics">Analytics</string>
+    <string name="this_month_spending">This month spending</string>
+    <string name="analytics_compared_last_month">-3.0% compared to last month</string>
+    <string name="see_all">See all</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="main_account_today">Main Account · Today</string>
 
 </resources>
