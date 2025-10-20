@@ -76,6 +76,7 @@
             android:layout_marginBottom="32dp">
 
             <TextView
+                android:id="@+id/select_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -85,6 +86,7 @@
                 app:drawableLeftCompat="@drawable/calendar" />
 
             <TextView
+                android:id="@+id/select_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

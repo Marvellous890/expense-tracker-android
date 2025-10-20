@@ -23,14 +23,14 @@
             android:layout_height="wrap_content"
             android:text="@string/entertainment"
             android:textColor="@color/black"
-            android:textFontWeight="600"
-            android:textSize="14sp" />
+            android:textFontWeight="600" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/main_account_today"
             android:textColor="@color/grayscale_600"
-            android:text="@string/main_account_today" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
@@ -40,22 +40,21 @@
         android:layout_marginLeft="8dp"
         android:layout_weight="1"
         android:gravity="right"
-        android:paddingRight="8dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingRight="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="₦4,906.76"
             android:textColor="@color/error_200"
-            android:textFontWeight="600"
-            android:textSize="14sp" />
+            android:textFontWeight="600" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/grayscale_600"
-            android:text="8:26 AM" />
+            android:text="8:26 AM"
+            android:textColor="@color/grayscale_600" />
 
     </LinearLayout>
 

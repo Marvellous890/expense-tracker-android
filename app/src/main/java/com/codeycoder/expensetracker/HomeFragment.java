@@ -126,7 +126,6 @@ public class HomeFragment extends Fragment {
 
         TextView totalBalanceText = new TextView(context);
         totalBalanceText.setText(R.string.total_balance);
-        totalBalanceText.setTextSize(14);
         totalBalanceText.setTextColor(getResources().getColor(R.color.grayscale_600));
         mainCardLayout.addView(totalBalanceText);
 
@@ -138,7 +137,6 @@ public class HomeFragment extends Fragment {
 
         TextView thisMonthText = new TextView(context);
         thisMonthText.setText(R.string.this_month);
-        thisMonthText.setTextSize(14);
         thisMonthText.setTextColor(getResources().getColor(R.color.grayscale_500));
         thisMonthText.setTypeface(getResources().getFont(R.font.notoserif_medium));
         mainCardLayout.addView(thisMonthText, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 16, 0, 8));
@@ -258,6 +256,7 @@ public class HomeFragment extends Fragment {
 
         TextView percentOfTotalBudgetSpent = new TextView(context);
         percentOfTotalBudgetSpent.setText(getString(R.string.percent_of_total_budget_spent, 50));
+        percentOfTotalBudgetSpent.setTextSize(12);
         budgetContainerLayout.addView(percentOfTotalBudgetSpent, LayoutHelper.createLinearWrapContent());
 
         RoundedCard analyticsCard = new RoundedCard(context, 16);
@@ -299,6 +298,7 @@ public class HomeFragment extends Fragment {
 
         TextView analyticsComparedText = new TextView(context);
         analyticsComparedText.setText(getString(R.string.analytics_compared_last_month));
+        analyticsComparedText.setTextSize(12);
         analyticsComparedText.setCompoundDrawablesWithIntrinsicBounds(getContext().getDrawable(R.drawable.decrease_peformance), null, null, null);
         analyticsComparedText.setCompoundDrawablePadding(dp(4));
         analyticsComparedText.setTextColor(context.getColor(R.color.success_300));
@@ -320,7 +320,6 @@ public class HomeFragment extends Fragment {
         recentTransactions.setText(getString(R.string.recent_transactions));
         recentTransactions.setTextColor(0xFF000000);
         recentTransactions.setTypeface(getResources().getFont(R.font.notoserif_semibold));
-        recentTransactions.setTextSize(14);
         recentTransactionsLayout.addView(recentTransactions, LayoutHelper.createLinear(0, -2, 1));
 
         Button seeAllBtn = new Button(context);
