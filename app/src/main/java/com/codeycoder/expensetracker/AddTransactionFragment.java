@@ -3,6 +3,7 @@ package com.codeycoder.expensetracker;
 
 import static com.codeycoder.expensetracker.Utilities.TAG;
 
+import android.animation.ObjectAnimator;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -12,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.codeycoder.expensetracker.databinding.FragmentAddTransactionBinding;
 import com.codeycoder.expensetracker.db.AppDatabase;
@@ -23,6 +26,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 public class AddTransactionFragment extends Fragment {
     private Context context;
@@ -35,6 +39,7 @@ public class AddTransactionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = requireContext();
         viewModel = new ViewModelProvider(this, new TransactionViewModelFactory(AppDatabase.Companion.getInstance(context).getTransactionDao())).get(TransactionViewModel.class);
+
     }
 
     @Override
@@ -78,8 +83,20 @@ public class AddTransactionFragment extends Fragment {
                     Log.d(TAG, "onTimeSet: " + hourOfDay + ", minute: " + minute);
                 }
             }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
-//            timePickerDialog.getTimePicker();
             timePickerDialog.show();
+        });
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Fragment navHostFragment = getParentFragmentManager().getPrimaryNavigationFragment();
+                if (Objects.equals(navHostFragment.getArguments().getString("tag"), "add_transaction_f")) {
+                    View navBar = ((MainActivity) requireActivity()).getBinding().navBar;
+                    navBar.setVisibility(View.VISIBLE);
+                    ObjectAnimator.ofFloat(navBar, "alpha", 0, 1).setDuration(250).start();
+                    NavHostFragment.findNavController(AddTransactionFragment.this).popBackStack();
+                }
+            }
         });
     }
 
