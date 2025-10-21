@@ -1,16 +1,15 @@
 package com.codeycoder.expensetracker
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.codeycoder.expensetracker.Utilities.TAG
 import com.codeycoder.expensetracker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -39,7 +38,9 @@ class MainActivity : AppCompatActivity() {
 
             if (tag == "home_f") {
                 navHostFragment.navController.navigate(R.id.action_homeFragment_to_addTransFragment)
-                binding.navBar.visibility = View.GONE
+                val anim = ObjectAnimator.ofFloat(binding.navBar, "alpha", 1f, 0f).setDuration(250)
+                anim.doOnEnd{ binding.navBar.visibility = View.GONE }
+                anim.start()
             }
 
         }

@@ -4,14 +4,20 @@ package com.codeycoder.expensetracker;
 import static com.codeycoder.expensetracker.Utilities.TAG;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -39,7 +45,12 @@ public class AddTransactionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = requireContext();
         viewModel = new ViewModelProvider(this, new TransactionViewModelFactory(AppDatabase.Companion.getInstance(context).getTransactionDao())).get(TransactionViewModel.class);
-
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                navigateBack();
+            }
+        });
     }
 
     @Override
@@ -49,6 +60,7 @@ public class AddTransactionFragment extends Fragment {
         // return inflater.inflate(R.layout.fragment_add_transaction, container, false);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, Bundle saveInstanceState) {
         binding.selectDate.setOnClickListener(v -> {
@@ -86,23 +98,38 @@ public class AddTransactionFragment extends Fragment {
             timePickerDialog.show();
         });
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Fragment navHostFragment = getParentFragmentManager().getPrimaryNavigationFragment();
-                if (Objects.equals(navHostFragment.getArguments().getString("tag"), "add_transaction_f")) {
-                    View navBar = ((MainActivity) requireActivity()).getBinding().navBar;
-                    navBar.setVisibility(View.VISIBLE);
-                    ObjectAnimator.ofFloat(navBar, "alpha", 0, 1).setDuration(250).start();
-                    NavHostFragment.findNavController(AddTransactionFragment.this).popBackStack();
+        binding.headerText.setOnTouchListener((tv, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) return true;
+
+            TextView textView = (TextView) tv;
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                Drawable drawableStart = textView.getCompoundDrawables()[0];
+                if (drawableStart != null) {
+                    RectF drawableStartRectF = new RectF(tv.getPaddingLeft(), tv.getPaddingTop(), tv.getPaddingLeft() + drawableStart.getBounds().width(), tv.getHeight() - tv.getPaddingBottom());
+                    if (drawableStartRectF.contains(event.getX(), event.getY())) {
+                        navigateBack();
+                    }
                 }
             }
+
+            return false;
         });
+    }
+
+    public void navigateBack() {
+        Fragment navHostFragment = getParentFragmentManager().getPrimaryNavigationFragment();
+        if (Objects.equals(navHostFragment.getArguments().getString("tag"), "add_transaction_f")) {
+            View navBar = ((MainActivity) requireActivity()).getBinding().navBar;
+            navBar.setVisibility(View.VISIBLE);
+            ObjectAnimator.ofFloat(navBar, "alpha", 0, 1).setDuration(250).start();
+            NavHostFragment.findNavController(AddTransactionFragment.this).popBackStack();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//        binding = null;
+        binding = null;
     }
 }

@@ -18,7 +18,6 @@ import com.codeycoder.expensetracker.Utilities;
 public class RoundedCard extends FrameLayout {
     int radius;
 
-    // todo remove
     public RoundedCard(Context context) {
         this(context, null);
     }
@@ -29,13 +28,18 @@ public class RoundedCard extends FrameLayout {
         try (TypedArray styleAttrs = context.obtainStyledAttributes(attrs, R.styleable.RoundedCard)) {
             this.radius = styleAttrs.getDimensionPixelSize(R.styleable.RoundedCard_radius, 0);
         }
+        init();
     }
-    // --------
 
     public RoundedCard(Context context, int radius) {
         super(context);
         this.radius = radius;
         setBackgroundColor(0xFFFFFFFF);
+        init();
+    }
+
+    public void init() {
+        setClickable(true);
     }
 
     @Override

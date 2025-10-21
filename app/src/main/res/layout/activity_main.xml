@@ -22,7 +22,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@color/grayscale_100"
+        android:background="#EEE7E5E4"
         app:radius="50dp">
 
         <LinearLayout

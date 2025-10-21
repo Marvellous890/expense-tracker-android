@@ -13,6 +13,7 @@ public class CircularIconButton extends FrameLayout {
 
     public CircularIconButton(@NonNull Context context) {
         super(context);
+        setClickable(true);
     }
 
     @Override
