@@ -1,8 +1,6 @@
 package com.codeycoder.expensetracker;
 
 
-import static com.codeycoder.expensetracker.Utilities.TAG;
-
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
@@ -10,7 +8,6 @@ import android.content.Context;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,7 +47,7 @@ public class AddTransactionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = requireContext();
-        viewModel = new ViewModelProvider(this, new TransactionViewModelFactory(AppDatabase.Companion.getInstance(context).getTransactionDao())).get(TransactionViewModel.class);
+        viewModel = new ViewModelProvider(this, new WithDaoViewModelFactory(AppDatabase.Companion.getInstance(context).getTransactionDao())).get(TransactionViewModel.class);
         requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {

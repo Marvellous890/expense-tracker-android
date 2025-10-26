@@ -26,21 +26,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codeycoder.expensetracker.databinding.FragmentHomeBinding;
+import com.codeycoder.expensetracker.db.AppDatabase;
 import com.codeycoder.expensetracker.views.Button;
 import com.codeycoder.expensetracker.views.CircularIconButton;
 import com.codeycoder.expensetracker.views.RoundableProgressBar;
 import com.codeycoder.expensetracker.views.RoundedCard;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements ViewModelOwner {
     private FragmentHomeBinding binding;
     private Context context;
     private HomeViewModel viewModel;
@@ -48,8 +49,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         context = requireContext();
+        viewModel = new ViewModelProvider(this, new WithDaoViewModelFactory(AppDatabase.Companion.getInstance(context).getTransactionDao())).get(HomeViewModel.class);
     }
 
     @Override
@@ -329,9 +330,12 @@ public class HomeFragment extends Fragment {
 
         RecyclerView transactionsList = new RecyclerView(context);
         transactionsList.setLayoutManager(new LinearLayoutManager(context));
-        TransactionListAdapter adapter = new TransactionListAdapter(context);
+        TransactionListAdapter adapter = new TransactionListAdapter(context, this);
         transactionsList.setAdapter(adapter);
         transactionsCardLayout.addView(transactionsList, LayoutHelper.createLinearMatchParent());
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(adapter.getItemTouchHelperCallBack());
+        itemTouchHelper.attachToRecyclerView(transactionsList);
 
 //        FrameLayout bottomBar = new RoundedCard(context, dp(50));
 //        bottomBar.setBackgroundColor(0xFFFF0000);
@@ -345,5 +349,10 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public ViewModel getViewModel() {
+        return viewModel;
     }
 }

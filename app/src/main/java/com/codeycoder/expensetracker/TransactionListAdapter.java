@@ -1,17 +1,24 @@
 package com.codeycoder.expensetracker;
 
+import static com.codeycoder.expensetracker.Utilities.TAG;
 import static com.codeycoder.expensetracker.Utilities.dp;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codeycoder.expensetracker.db.AppDatabase;
@@ -26,15 +33,66 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
 public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_CUSTOM = 1;
     private final Context context;
+    private final ViewModelOwner viewModelOwner;
     private List<Transaction> data = new ArrayList<>();
 
+    public ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder dragged, @NonNull RecyclerView.ViewHolder target) {
+                /*example:
+                val sourcePosition = source.adapterPosition
+               val targetPosition = target.adapterPosition
 
-    public TransactionListAdapter(Context context) {
+               Collections.swap(itemsArrayList,sourcePosition,targetPosition)
+               myAdapter.notifyItemMoved(sourcePosition,targetPosition)
+                * */
+
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            if (direction == ItemTouchHelper.LEFT) {
+                // delete from db
+                ViewModel vm = viewModelOwner.getViewModel();
+                if (vm instanceof HomeViewModel) {
+                    HomeViewModel homeVm = (HomeViewModel) vm;
+                    int position = viewHolder.getBindingAdapterPosition();
+                    Transaction t = data.get(position);
+                    homeVm.deleteTransaction(t);
+                    notifyItemRemoved(position);
+                    Toast.makeText(context, "'" + t.getName() + "' deleted successfully", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        public void onChildDraw (Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive){
+            // I am disabling Right swipe for now
+            if (dX > 0) return;
+
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addSwipeLeftBackgroundColor(ContextCompat.getColor(context, R.color.error_200))
+                    .addSwipeLeftActionIcon(R.drawable.trash)
+                    .setSwipeLeftActionIconTint(0xFFFFFFFF)
+                    .create()
+                    .decorate();
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+    };
+
+    public ItemTouchHelper.Callback getItemTouchHelperCallBack() {
+        return callback;
+    }
+
+    public TransactionListAdapter(Context context, ViewModelOwner viewModelOwner) {
         this.context = context;
+        this.viewModelOwner = viewModelOwner;
 
         TransactionDao transactionDao = AppDatabase.Companion.getInstance(context).getTransactionDao();
         LiveData<List<Transaction>> transLiveData = transactionDao.getAll();
@@ -93,11 +151,5 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (position == data.size()) return TYPE_CUSTOM;
 
         return TYPE_ITEM;
-    }
-
-    public class TransListViewHolder extends RecyclerView.ViewHolder {
-        public TransListViewHolder(View itemView) {
-            super(itemView);
-        }
     }
 }
