@@ -16,9 +16,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:drawableLeftCompat="@drawable/arrow_left"
             android:drawablePadding="24dp"
-            android:text="@string/add_transaction" />
+            android:text="@string/add_transaction"
+            app:drawableLeftCompat="@drawable/arrow_left" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/TextInputLayout"
@@ -27,6 +27,7 @@
             android:layout_marginBottom="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/expense_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/expense_name"
@@ -43,6 +44,7 @@
             app:endIconMode="custom">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/expense_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/amount"
@@ -57,6 +59,7 @@
             android:layout_marginBottom="32dp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/expense_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/description"
@@ -97,7 +100,7 @@
                 app:drawableLeftCompat="@drawable/clock_four" />
         </LinearLayout>
 
-        <TextView
+        <!--<TextView
             style="@style/Heading.H5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -107,8 +110,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/select_a_budget"
             android:fontFamily="@font/notoserif_medium"
+            android:text="@string/select_a_budget"
             android:textSize="14sp" />
 
         <com.codeycoder.expensetracker.views.RoundedCard
@@ -128,10 +131,11 @@
                 app:drawableStartCompat="@drawable/bank_card_line"
                 app:drawableTint="@color/error_200" />
 
-        </com.codeycoder.expensetracker.views.RoundedCard>
+        </com.codeycoder.expensetracker.views.RoundedCard>-->
     </LinearLayout>
 
     <com.codeycoder.expensetracker.views.RoundedCard
+        android:id="@+id/add_trans_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

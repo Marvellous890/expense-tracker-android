@@ -329,8 +329,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView transactionsList = new RecyclerView(context);
         transactionsList.setLayoutManager(new LinearLayoutManager(context));
-        TransactionListAdapter adapter = new TransactionListAdapter();
-        setData(adapter);
+        TransactionListAdapter adapter = new TransactionListAdapter(context);
         transactionsList.setAdapter(adapter);
         transactionsCardLayout.addView(transactionsList, LayoutHelper.createLinearMatchParent());
 
@@ -340,23 +339,6 @@ public class HomeFragment extends Fragment {
 
         return root;
 
-    }
-
-    private void setData(TransactionListAdapter adapter) {
-        List<Transaction> data = new ArrayList<>();
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        data.add(new Transaction("", 0, 0));
-        adapter.setData(data);
     }
 
     @Override

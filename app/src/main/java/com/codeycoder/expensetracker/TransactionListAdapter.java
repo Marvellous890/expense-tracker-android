@@ -2,35 +2,55 @@ package com.codeycoder.expensetracker;
 
 import static com.codeycoder.expensetracker.Utilities.dp;
 
-import android.util.Log;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.codeycoder.expensetracker.db.AppDatabase;
+import com.codeycoder.expensetracker.db.Transaction;
+import com.codeycoder.expensetracker.db.TransactionDao;
 import com.codeycoder.expensetracker.views.Button;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_CUSTOM = 1;
+    private final Context context;
     private List<Transaction> data = new ArrayList<>();
 
-    public void setData(List<Transaction> data) {
-        this.data = data;
-        notifyDataSetChanged();
+
+    public TransactionListAdapter(Context context) {
+        this.context = context;
+
+        TransactionDao transactionDao = AppDatabase.Companion.getInstance(context).getTransactionDao();
+        LiveData<List<Transaction>> transLiveData = transactionDao.getAll();
+        transLiveData.observe((LifecycleOwner) context, transactions -> {
+            if (transactions != null) {
+                data = transactions;
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View root;
-        switch(viewType) {
+        switch (viewType) {
             case TYPE_CUSTOM:
                 View v = new View(parent.getContext());
                 v.setLayoutParams(new RecyclerView.LayoutParams(-1, dp(70)));
@@ -41,7 +61,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 root = LayoutInflater.from(parent.getContext()).inflate(R.layout.transaction, parent, false);
                 break;
         }
-        return new RecyclerView.ViewHolder(root){};
+        return new RecyclerView.ViewHolder(root) {
+        };
     }
 
     @Override
@@ -51,6 +72,14 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             Button b = v.findViewById(R.id.t_icon);
             b.setPadding(dp(0), dp(0), dp(0), dp(0));
             b.setIcon(v.getContext().getDrawable(R.drawable.coins_line));
+
+            Transaction transaction = data.get(position);
+
+
+            ((TextView) v.findViewById(R.id.trans_name)).setText(transaction.getName());
+            ((TextView) v.findViewById(R.id.trans_desc)).setText(context.getString(R.string.main_account_today, Utilities.geyFriendlyDateTime(transaction.getTransactionTime())));
+            ((TextView) v.findViewById(R.id.trans_cost)).setText(context.getString(R.string.naira_amount, NumberFormat.getNumberInstance().format(transaction.getAmount())));
+            ((TextView) v.findViewById(R.id.trans_time)).setText(new SimpleDateFormat("hh:mm a").format(new Date(transaction.getTransactionTime())));
         }
     }
 

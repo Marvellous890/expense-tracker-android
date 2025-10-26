@@ -18,7 +18,7 @@
     <string name="see_all">See all</string>
     <string name="recent_transactions">Recent Transactions</string>
     <string name="entertainment">Entertainment</string>
-    <string name="main_account_today">Main Account · Today</string>
+    <string name="main_account_today">Main Account · %1$s</string>
     <string name="add_transaction">Add Transaction</string>
     <string name="expense_name">Expense Name</string>
     <string name="amount">Amount</string>

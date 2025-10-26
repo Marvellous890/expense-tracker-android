@@ -16,14 +16,13 @@ data class Transaction(
     @ColumnInfo(name = "transaction_time")
     var transactionTime: Long,
 
-    var type: String = "expense",
-
     @ColumnInfo(defaultValue = "NULL")
     var description: String? = null
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
-
+    @ColumnInfo(defaultValue = "expense")
+    var type: String = "expense"
     @ColumnInfo(name = "budget_id", defaultValue = "NULL")
     var budgetId: Long? = null
 }

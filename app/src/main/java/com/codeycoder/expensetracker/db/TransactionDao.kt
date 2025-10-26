@@ -10,7 +10,7 @@ import androidx.room.Update
 @Dao
 interface TransactionDao {
     @Insert
-    suspend fun insert(transaction: Transaction)
+    suspend fun insert(transaction: Transaction): Long
 
     @Update
     suspend fun update(transaction: Transaction)
@@ -21,6 +21,6 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :transactionId")
     fun get(transactionId: Long): LiveData<Transaction>
 
-    @Query("SELECT * FROM transactions ORDER BY id DESC")
+    @Query("SELECT * FROM transactions ORDER BY transaction_time DESC")
     fun getAll(): LiveData<List<Transaction>>
 }

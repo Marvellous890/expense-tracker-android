@@ -19,6 +19,7 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/trans_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/entertainment"
@@ -26,6 +27,7 @@
             android:textFontWeight="600" />
 
         <TextView
+            android:id="@+id/trans_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/main_account_today"
@@ -44,6 +46,7 @@
         android:paddingRight="8dp">
 
         <TextView
+            android:id="@+id/trans_cost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="₦4,906.76"
@@ -51,6 +54,7 @@
             android:textFontWeight="600" />
 
         <TextView
+            android:id="@+id/trans_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="8:26 AM"

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4f693cee04ad07fadbc049f4b367cd57",
+    "identityHash": "697f42e27d807d055fd4af40539865b2",
     "entities": [
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `amount` REAL NOT NULL, `time_added` INTEGER NOT NULL, `transaction_time` INTEGER NOT NULL, `type` TEXT NOT NULL, `description` TEXT DEFAULT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `budget_id` INTEGER DEFAULT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `amount` REAL NOT NULL, `time_added` INTEGER NOT NULL, `transaction_time` INTEGER NOT NULL, `description` TEXT DEFAULT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL DEFAULT 'expense', `budget_id` INTEGER DEFAULT NULL)",
         "fields": [
           {
             "fieldPath": "name",
@@ -33,12 +33,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "type",
-            "columnName": "type",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "description",
             "columnName": "description",
             "affinity": "TEXT",
@@ -50,6 +44,13 @@
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'expense'"
           },
           {
             "fieldPath": "budgetId",
@@ -72,7 +73,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f693cee04ad07fadbc049f4b367cd57')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '697f42e27d807d055fd4af40539865b2')"
     ]
   }
 }
