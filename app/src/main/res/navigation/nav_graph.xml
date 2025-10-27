@@ -28,8 +28,27 @@
         android:name="com.codeycoder.expensetracker.AddTransactionFragment"
         tools:layout="@layout/fragment_home">
         <argument
+            android:name="updating"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
             android:name="tag"
             android:defaultValue="add_transaction_f"
             app:argType="string" />
+        <argument
+            android:name="transaction_id"
+            app:argType="long" />
+        <argument
+            android:name="expenseName"
+            app:argType="string" />
+        <argument
+            android:name="expenseAmount"
+            app:argType="float" />
+        <argument
+            android:name="expenseDesc"
+            app:argType="string" />
+        <argument
+            android:name="expenseTransTime"
+            app:argType="long" />
     </fragment>
 </navigation>

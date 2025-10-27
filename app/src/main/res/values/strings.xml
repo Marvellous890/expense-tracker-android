@@ -30,6 +30,7 @@
     <string name="select_a_budget">Select a budget</string>
     <string name="new_monthly_budget">New Monthly Budget</string>
     <string name="add">Add</string>
+    <string name="update">Update</string>
     <string name="select_date">Select date</string>
 
 </resources>

@@ -8,10 +8,7 @@ import android.graphics.RectF;
 import android.view.View;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Utilities {
@@ -32,7 +29,7 @@ public class Utilities {
         return divider;
     }
 
-    public static String geyFriendlyDateTime(long timestamp) {
+    public static String getFriendlyDateTime(long timestamp) {
         Date txDate = new Date(timestamp);
 
         java.util.Calendar nowCal = java.util.Calendar.getInstance();
@@ -67,5 +64,35 @@ public class Utilities {
             friendlyDate = fmt.format(txDate);
         }
         return friendlyDate;
+    }
+
+
+    public static class TimeParts {
+        public final long dayStartLocalMillis;
+        public final int hour24;
+        public final int minute;
+
+        public TimeParts(long dayStartLocalMillis, int hour24, int minute) {
+            this.dayStartLocalMillis = dayStartLocalMillis;
+            this.hour24 = hour24;
+            this.minute = minute;
+        }
+    }
+
+    public static TimeParts splitUtcTimestamp(long utcMillis) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(utcMillis);
+
+        int hour = cal.get(Calendar.HOUR_OF_DAY); // 0-23
+        int minute = cal.get(Calendar.MINUTE);    // 0-59
+
+        // Compute local midnight for the same local date
+        Calendar dayStart = (Calendar) cal.clone();
+        dayStart.set(Calendar.HOUR_OF_DAY, 0);
+        dayStart.set(Calendar.MINUTE, 0);
+        dayStart.set(Calendar.SECOND, 0);
+        dayStart.set(Calendar.MILLISECOND, 0);
+
+        return new TimeParts(dayStart.getTimeInMillis(), hour, minute);
     }
 }

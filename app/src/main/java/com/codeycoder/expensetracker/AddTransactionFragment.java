@@ -43,6 +43,13 @@ public class AddTransactionFragment extends Fragment {
     private FragmentAddTransactionBinding binding;
     private MaterialDatePicker<Long> datePicker;
 
+    private TextWatcher expenseNameWatcher;
+    private TextWatcher expenseAmountWatcher;
+    private TextWatcher expenseDescWatcher;
+
+    private boolean updating;
+    private long transactionId;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +90,7 @@ public class AddTransactionFragment extends Fragment {
             datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
                 @Override
                 public void onPositiveButtonClick(Long selection) {
-                    viewModel.setDate(selection);
+                    setDate(selection);
                 }
             });
             datePicker.show(getParentFragmentManager(), "date");
@@ -99,7 +106,7 @@ public class AddTransactionFragment extends Fragment {
             TimePickerDialog timePickerDialog = new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    viewModel.setTime(hourOfDay, minute);
+                    setTime(hourOfDay, minute);
                 }
             }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
             timePickerDialog.show();
@@ -127,18 +134,23 @@ public class AddTransactionFragment extends Fragment {
             @Override
             public void onChanged(Boolean newValue) {
                 if (newValue) {
-                    Toast.makeText(context, "Transaction added successfully", Toast.LENGTH_SHORT).show();
+                    String verb = updating ? "updated" : "added";
+                    Toast.makeText(context, "Transaction " + verb + " successfully", Toast.LENGTH_SHORT).show();
                     navigateBack();
                 }
             }
         });
 
         binding.addTransBtn.setOnClickListener(v -> {
-            viewModel.addTransaction();
+            if (updating) {
+                viewModel.updateTransaction(transactionId);
+            } else {
+                viewModel.addTransaction();
+            }
         });
 
-        // Wire up EditTexts to ViewModel
-        binding.expenseName.addTextChangedListener(new TextWatcher() {
+        // Wire up EditTexts to ViewModel: define named watchers and attach them
+        expenseNameWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -151,9 +163,10 @@ public class AddTransactionFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
             }
-        });
+        };
+        binding.expenseName.addTextChangedListener(expenseNameWatcher);
 
-        binding.expenseAmount.addTextChangedListener(new TextWatcher() {
+        expenseAmountWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -166,9 +179,10 @@ public class AddTransactionFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
             }
-        });
+        };
+        binding.expenseAmount.addTextChangedListener(expenseAmountWatcher);
 
-        binding.expenseDesc.addTextChangedListener(new TextWatcher() {
+        expenseDescWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -181,7 +195,83 @@ public class AddTransactionFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
             }
+        };
+        binding.expenseDesc.addTextChangedListener(expenseDescWatcher);
+
+        viewModel.getExpenseNameLive().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String newValue) {
+                if (newValue == null) newValue = "";
+                String current = binding.expenseName.getText() == null ? "" : binding.expenseName.getText().toString();
+                if (!current.equals(newValue)) {
+                    binding.expenseName.removeTextChangedListener(expenseNameWatcher);
+                    binding.expenseName.setText(newValue);
+                    binding.expenseName.setSelection(newValue.length());
+                    binding.expenseName.addTextChangedListener(expenseNameWatcher);
+                }
+            }
         });
+
+        viewModel.getExpenseAmountLive().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String newValue) {
+                if (newValue == null) newValue = "";
+                String current = binding.expenseAmount.getText() == null ? "" : binding.expenseAmount.getText().toString();
+                if (!current.equals(newValue)) {
+                    binding.expenseAmount.removeTextChangedListener(expenseAmountWatcher);
+                    binding.expenseAmount.setText(newValue);
+                    binding.expenseAmount.setSelection(newValue.length());
+                    binding.expenseAmount.addTextChangedListener(expenseAmountWatcher);
+                }
+            }
+        });
+
+        viewModel.getExpenseDescLive().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String newValue) {
+                if (newValue == null) newValue = "";
+                String current = binding.expenseDesc.getText() == null ? "" : binding.expenseDesc.getText().toString();
+                if (!current.equals(newValue)) {
+                    binding.expenseDesc.removeTextChangedListener(expenseDescWatcher);
+                    binding.expenseDesc.setText(newValue);
+                    binding.expenseDesc.setSelection(newValue.length());
+                    binding.expenseDesc.addTextChangedListener(expenseDescWatcher);
+                }
+            }
+        });
+
+
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.getBoolean("updating")) {
+            updating = true;
+            transactionId = arguments.getLong("transaction_id");
+            viewModel.setExpenseName(arguments.getString("expenseName", ""));
+            viewModel.setExpenseAmount(String.valueOf(arguments.getFloat("expenseAmount", 0f)));
+            viewModel.setExpenseDesc(arguments.getString("expenseDesc", ""));
+
+            long expenseTransTime = arguments.getLong("expenseTransTime");
+            Utilities.TimeParts tp = Utilities.splitUtcTimestamp(expenseTransTime);
+            setDate(tp.dayStartLocalMillis);
+            setTime(tp.hour24, tp.minute);
+        }
+
+        if (updating) {
+            ((TextView) binding.addTransBtn.getChildAt(0)).setText(getString(R.string.update));
+        }
+    }
+
+    private void setDate(long dayStartLocalMillis) {
+        viewModel.setDate(dayStartLocalMillis);
+        binding.selectDate.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(dayStartLocalMillis)));
+    }
+
+    private void setTime(int hourOfDay, int minute) {
+        viewModel.setTime(hourOfDay, minute);
+
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        cal.set(Calendar.MINUTE, minute);
+        binding.selectTime.setText(new SimpleDateFormat("hh:mm a").format(new Date(cal.getTimeInMillis())));
     }
 
     public void navigateBack() {

@@ -1,11 +1,9 @@
 package com.codeycoder.expensetracker;
 
-import static com.codeycoder.expensetracker.Utilities.TAG;
 import static com.codeycoder.expensetracker.Utilities.dp;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,6 @@ import com.codeycoder.expensetracker.views.Button;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +34,7 @@ import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
 public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_ITEM = 0;
-    private static final int TYPE_CUSTOM = 1;
+    private static final int TYPE_ENDPADDING = 1;
     private final Context context;
     private final ViewModelOwner viewModelOwner;
     private List<Transaction> data = new ArrayList<>();
@@ -70,13 +67,24 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     Toast.makeText(context, "'" + t.getName() + "' deleted successfully", Toast.LENGTH_SHORT).show();
                 }
             }
+
+            if (direction == ItemTouchHelper.RIGHT) {
+                // edit
+                Transaction t = data.get(viewHolder.getBindingAdapterPosition());
+                HomeFragmentDirections.ActionHomeFragmentToAddTransFragment dir = HomeFragmentDirections.actionHomeFragmentToAddTransFragment(t.getId(), t.getName(), t.getAmount(), t.getDescription(), t.getTransactionTime());
+                dir.setUpdating(true);
+                if (context instanceof MainActivity) {
+                    MainActivity ma = (MainActivity) context;
+                    ma.navigateTo(dir);
+                }
+            }
         }
 
-        public void onChildDraw (Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive){
-            // I am disabling Right swipe for now
-            if (dX > 0) return;
-
+        public void onChildDraw (@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive){
             new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addSwipeRightBackgroundColor(ContextCompat.getColor(context, R.color.grayscale_500))
+                    .addSwipeRightActionIcon(R.drawable.write)
+                    .setSwipeRightActionIconTint(0xFFFFFFFF)
                     .addSwipeLeftBackgroundColor(ContextCompat.getColor(context, R.color.error_200))
                     .addSwipeLeftActionIcon(R.drawable.trash)
                     .setSwipeLeftActionIconTint(0xFFFFFFFF)
@@ -109,7 +117,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View root;
         switch (viewType) {
-            case TYPE_CUSTOM:
+            case TYPE_ENDPADDING:
                 View v = new View(parent.getContext());
                 v.setLayoutParams(new RecyclerView.LayoutParams(-1, dp(70)));
                 root = v;
@@ -135,7 +143,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
 
             ((TextView) v.findViewById(R.id.trans_name)).setText(transaction.getName());
-            ((TextView) v.findViewById(R.id.trans_desc)).setText(context.getString(R.string.main_account_today, Utilities.geyFriendlyDateTime(transaction.getTransactionTime())));
+            ((TextView) v.findViewById(R.id.trans_desc)).setText(context.getString(R.string.main_account_today, Utilities.getFriendlyDateTime(transaction.getTransactionTime())));
             ((TextView) v.findViewById(R.id.trans_cost)).setText(context.getString(R.string.naira_amount, NumberFormat.getNumberInstance().format(transaction.getAmount())));
             ((TextView) v.findViewById(R.id.trans_time)).setText(new SimpleDateFormat("hh:mm a").format(new Date(transaction.getTransactionTime())));
         }
@@ -148,7 +156,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public int getItemViewType(int position) {
-        if (position == data.size()) return TYPE_CUSTOM;
+        if (position == data.size()) return TYPE_ENDPADDING;
 
         return TYPE_ITEM;
     }

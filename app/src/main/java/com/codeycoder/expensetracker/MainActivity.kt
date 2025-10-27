@@ -10,6 +10,7 @@ import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavDirections
 import com.codeycoder.expensetracker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -32,21 +33,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.addTrans.setOnClickListener {
-            val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
-            val currentFragment = navHostFragment.childFragmentManager.primaryNavigationFragment
-            val tag = currentFragment?.arguments?.getString("tag") ?: ""
-
-            if (tag == "home_f") {
-                navHostFragment.navController.navigate(R.id.action_homeFragment_to_addTransFragment)
-                val anim = ObjectAnimator.ofFloat(binding.navBar, "alpha", 1f, 0f).setDuration(250)
-                anim.doOnEnd{ binding.navBar.visibility = View.GONE }
-                anim.start()
-            }
-
+            navigateTo(null)
         }
     }
 
     fun getBinding(): ActivityMainBinding {
         return binding
+    }
+
+    fun navigateTo(direction: NavDirections?) {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as androidx.navigation.fragment.NavHostFragment
+        val currentFragment = navHostFragment.childFragmentManager.primaryNavigationFragment
+        val tag = currentFragment?.arguments?.getString("tag") ?: ""
+        val navController = navHostFragment.navController
+        var navigating = false
+
+        if (direction != null) {
+            navigating = true
+            navController.navigate(direction)
+        } else if (tag == "home_f") {
+            navigating = true
+            navController.navigate(R.id.action_homeFragment_to_addTransFragment)
+        }
+
+        if (navigating) {
+            val anim = ObjectAnimator.ofFloat(binding.navBar, "alpha", 1f, 0f).setDuration(250)
+            anim.doOnEnd { binding.navBar.visibility = View.GONE }
+            anim.start()
+        }
     }
 }
