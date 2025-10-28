@@ -71,7 +71,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             if (direction == ItemTouchHelper.RIGHT) {
                 // edit
                 Transaction t = data.get(viewHolder.getBindingAdapterPosition());
-                HomeFragmentDirections.ActionHomeFragmentToAddTransFragment dir = HomeFragmentDirections.actionHomeFragmentToAddTransFragment(t.getId(), t.getName(), t.getAmount(), t.getDescription(), t.getTransactionTime());
+                HomeFragmentDirections.ActionHomeFragmentToAddTransFragment dir = HomeFragmentDirections.actionHomeFragmentToAddTransFragment(t.getId(), t.getName(), t.getAmount(), t.getDescription(), t.getTimeAdded());
                 dir.setUpdating(true);
                 if (context instanceof MainActivity) {
                     MainActivity ma = (MainActivity) context;

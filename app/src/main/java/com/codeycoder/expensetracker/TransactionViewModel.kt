@@ -89,9 +89,9 @@ class TransactionViewModel(val dao: TransactionDao) : ViewModel() {
 
         if (timeAdded <= 0L) timeAdded = System.currentTimeMillis()
 
-        Log.d(TAG, "timeAdded: " + SimpleDateFormat.getInstance().format(Date(timeAdded)))
         return timeAdded
     }
+
     fun updateTransaction(transactionId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             val transaction = dao.get(transactionId).apply {

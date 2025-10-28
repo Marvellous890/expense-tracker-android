@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class AddTransactionFragment extends Fragment {
     private Context context;
@@ -78,6 +79,8 @@ public class AddTransactionFragment extends Fragment {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, Bundle saveInstanceState) {
+        binding.expenseName.requestFocus();
+
         binding.selectDate.setOnClickListener(v -> {
             datePicker = (MaterialDatePicker<Long>) getParentFragmentManager().findFragmentByTag("date");
             if (datePicker == null || !datePicker.isAdded()) {
@@ -254,7 +257,7 @@ public class AddTransactionFragment extends Fragment {
 
             long expenseTransTime = arguments.getLong("expenseTransTime");
             Utilities.TimeParts tp = Utilities.splitUtcTimestamp(expenseTransTime);
-            setDate(tp.dayStartLocalMillis);
+            setDate(tp.dayStartLocalMillis + TimeZone.getDefault().getOffset(tp.dayStartLocalMillis));
             setTime(tp.hour24, tp.minute);
         }
 
