@@ -1,6 +1,8 @@
 package com.codeycoder.expensetracker;
 
 
+import static com.codeycoder.expensetracker.Utilities.TAG;
+
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
@@ -8,6 +10,7 @@ import android.content.Context;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +52,8 @@ public class AddTransactionFragment extends Fragment {
 
     private boolean updating;
     private long transactionId;
+
+    Calendar calendar = Calendar.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,8 +100,6 @@ public class AddTransactionFragment extends Fragment {
             });
             datePicker.show(getParentFragmentManager(), "date");
         });
-
-        Calendar calendar = Calendar.getInstance();
 
         binding.selectDate.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
 
@@ -262,16 +265,17 @@ public class AddTransactionFragment extends Fragment {
 
     private void setDate(long dayStartLocalMillis) {
         viewModel.setDate(dayStartLocalMillis);
+        viewModel.setTimeIfZero(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
         binding.selectDate.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date(dayStartLocalMillis)));
     }
 
     private void setTime(int hourOfDay, int minute) {
         viewModel.setTime(hourOfDay, minute);
+        viewModel.setDateIfZero(MaterialDatePicker.todayInUtcMilliseconds());
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        cal.set(Calendar.MINUTE, minute);
-        binding.selectTime.setText(new SimpleDateFormat("hh:mm a").format(new Date(cal.getTimeInMillis())));
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
+        binding.selectTime.setText(new SimpleDateFormat("hh:mm a").format(new Date(calendar.getTimeInMillis())));
     }
 
     public void navigateBack() {

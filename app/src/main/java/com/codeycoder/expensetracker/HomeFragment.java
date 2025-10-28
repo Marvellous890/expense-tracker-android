@@ -323,10 +323,10 @@ public class HomeFragment extends Fragment implements ViewModelOwner {
         recentTransactions.setTypeface(getResources().getFont(R.font.notoserif_semibold));
         recentTransactionsLayout.addView(recentTransactions, LayoutHelper.createLinear(0, -2, 1));
 
-        Button seeAllBtn = new Button(context);
+        /*Button seeAllBtn = new Button(context);
         seeAllBtn.setBackground(context.getDrawable(R.drawable.bg));
         seeAllBtn.setText(getString(R.string.see_all));
-        recentTransactionsLayout.addView(seeAllBtn, LayoutHelper.createLinearWrapContent());
+        recentTransactionsLayout.addView(seeAllBtn, LayoutHelper.createLinearWrapContent());*/
 
         RecyclerView transactionsList = new RecyclerView(context);
         transactionsList.setLayoutManager(new LinearLayoutManager(context));

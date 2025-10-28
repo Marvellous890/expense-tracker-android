@@ -143,9 +143,9 @@ public class TransactionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
 
             ((TextView) v.findViewById(R.id.trans_name)).setText(transaction.getName());
-            ((TextView) v.findViewById(R.id.trans_desc)).setText(context.getString(R.string.main_account_today, Utilities.getFriendlyDateTime(transaction.getTransactionTime())));
             ((TextView) v.findViewById(R.id.trans_cost)).setText(context.getString(R.string.naira_amount, NumberFormat.getNumberInstance().format(transaction.getAmount())));
-            ((TextView) v.findViewById(R.id.trans_time)).setText(new SimpleDateFormat("hh:mm a").format(new Date(transaction.getTransactionTime())));
+            ((TextView) v.findViewById(R.id.trans_desc)).setText(context.getString(R.string.main_account_today, Utilities.getFriendlyDateTime(transaction.getTimeAdded())));
+            ((TextView) v.findViewById(R.id.trans_time)).setText(new SimpleDateFormat("hh:mm a").format(new Date(transaction.getTimeAdded())));
         }
     }
 

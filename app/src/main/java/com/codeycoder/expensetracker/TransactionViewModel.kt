@@ -1,8 +1,8 @@
 package com.codeycoder.expensetracker
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +13,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.TimeZone
 import androidx.lifecycle.asLiveData
+import com.codeycoder.expensetracker.Utilities.TAG
+import kotlinx.coroutines.Dispatchers
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class TransactionViewModel(val dao: TransactionDao) : ViewModel() {
     private val _expenseName = MutableStateFlow("")
@@ -32,8 +36,8 @@ class TransactionViewModel(val dao: TransactionDao) : ViewModel() {
     private val _insertSuccess = MutableLiveData(false)
     val insertSuccess: LiveData<Boolean> = _insertSuccess
 
-    private val expenseDate = MutableLiveData(0L)
-    private val expenseTime = MutableLiveData(0L)
+    private var expenseDate = 0L
+    private var expenseTime = 0L
 
     fun setExpenseName(name: String) {
         _expenseName.value = name
@@ -48,58 +52,56 @@ class TransactionViewModel(val dao: TransactionDao) : ViewModel() {
     }
 
     fun setDate(date: Long) {
-        expenseDate.value = date
+        expenseDate = date
+    }
+
+    fun setDateIfZero(date: Long) {
+        if (expenseDate == 0L) setDate(date)
+    }
+
+    fun setTimeIfZero(hour: Int, minute: Int) {
+        if (expenseTime == 0L) setTime(hour, minute)
     }
 
     fun setTime(hour: Int, minute: Int) {
-        expenseTime.value = 60_000L * (hour * 60L + minute)
+        expenseTime = 60_000L * (hour * 60L + minute)
     }
 
     fun addTransaction() {
         viewModelScope.launch {
-            val timeAdded = computeTimeAdded()
-
             val id = dao.insert(
                 Transaction(
                     _expenseName.value,
                     _expenseAmount.value.toFloatOrNull() ?: 0f,
-                    timeAdded,
+                    computeTimeAdded(),
                     System.currentTimeMillis(),
                     _expenseDesc.value
                 )
             )
-
             if (id > 0L) _insertSuccess.value = true
         }
     }
 
-    fun computeTimeAdded(): Long {
-        var timeAdded = (expenseDate.value ?: 0L) + (expenseTime.value ?: 0L)
+    private fun computeTimeAdded(): Long {
+        var timeAdded = expenseDate + expenseTime
         val offset = TimeZone.getDefault().getOffset(timeAdded)
         timeAdded -= offset
 
         if (timeAdded <= 0L) timeAdded = System.currentTimeMillis()
 
+        Log.d(TAG, "timeAdded: " + SimpleDateFormat.getInstance().format(Date(timeAdded)))
         return timeAdded
     }
-
     fun updateTransaction(transactionId: Long) {
-        val transLiveData = dao.get(transactionId)
-
-        val observer = object : Observer<Transaction> {
-            override fun onChanged(value: Transaction) {
-                value.name = _expenseName.value
-                value.amount = _expenseAmount.value.toFloatOrNull() ?: 0f
-                value.description = _expenseDesc.value
-                value.timeAdded = computeTimeAdded()
-                viewModelScope.launch {
-                    dao.update(value)
-                    _insertSuccess.value = true
-                    transLiveData.removeObserver{ this }
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            val transaction = dao.get(transactionId).apply {
+                name = _expenseName.value
+                amount = _expenseAmount.value.toFloatOrNull() ?: 0f
+                description = _expenseDesc.value
+                timeAdded = computeTimeAdded()
             }
-
+            dao.update(transaction)
+            _insertSuccess.postValue(true)
         }
-        transLiveData.observeForever(observer)
     }
 }

@@ -10,9 +10,11 @@ data class Transaction(
 
     var amount: Float,
 
+    // The time as chosen by the user
     @ColumnInfo(name = "time_added")
     var timeAdded: Long,
 
+    // The instant in time the transaction was added
     @ColumnInfo(name = "transaction_time")
     var transactionTime: Long,
 
